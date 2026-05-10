@@ -6,8 +6,13 @@ WORKDIR /app
 RUN groupadd -r hexstrike && useradd -r -g hexstrike hexstrike
 
 RUN apt-get update && apt-get install -y \
-    curl wget git nmap dnsutils whois unzip \
+    curl wget git nmap dnsutils whois unzip perl \
     && rm -rf /var/lib/apt/lists/*
+
+# nikto — install from source (not in standard debian repos)
+RUN git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto && \
+    ln -s /opt/nikto/program/nikto.pl /usr/local/bin/nikto && \
+    chmod +x /opt/nikto/program/nikto.pl
 
 # wafw00f (Python)
 RUN pip install --no-cache-dir wafw00f
