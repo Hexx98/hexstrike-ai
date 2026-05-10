@@ -29,7 +29,11 @@ RUN go install -v github.com/projectdiscovery/katana/cmd/katana@latest 2>/dev/nu
 RUN go install -v github.com/hakluke/hakrawler@latest 2>/dev/null || true
 RUN go install -v github.com/lc/gau/v2/cmd/gau@latest 2>/dev/null || true
 RUN go install -v github.com/OJ/gobuster/v3@latest 2>/dev/null || true
-RUN go install -v github.com/OWASP/Amass/v4/...@latest 2>/dev/null || true
+# amass — pre-built binary (go install is too slow to compile)
+RUN curl -sL https://github.com/owasp-amass/amass/releases/download/v4.2.0/amass_Linux_amd64.zip \
+    -o /tmp/amass.zip && unzip -q /tmp/amass.zip -d /tmp/amass && \
+    mv /tmp/amass/amass_Linux_amd64/amass /usr/local/bin/ && \
+    chmod +x /usr/local/bin/amass && rm -rf /tmp/amass /tmp/amass.zip 2>/dev/null || true
 
 # Copy Go binaries to system PATH
 RUN cp /root/go/bin/* /usr/local/bin/ 2>/dev/null || true
