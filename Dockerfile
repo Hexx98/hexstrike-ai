@@ -19,7 +19,8 @@ RUN pip install --no-cache-dir wafw00f
 
 # Go 1.22
 RUN curl -sSL https://go.dev/dl/go1.22.3.linux-amd64.tar.gz | tar -C /usr/local -xz
-ENV PATH=$PATH:/usr/local/go/bin
+ENV PATH=$PATH:/usr/local/go/bin:/usr/local/go-tools/bin
+ENV GOPATH=/usr/local/go-tools
 
 # Go-based recon tools
 RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest 2>/dev/null || true
@@ -43,6 +44,26 @@ RUN curl -sL https://github.com/epi052/feroxbuster/releases/latest/download/x86-
     -o /tmp/ferox.zip && unzip -q /tmp/ferox.zip -d /tmp && \
     mv /tmp/feroxbuster /usr/local/bin/ && chmod +x /usr/local/bin/feroxbuster && \
     rm /tmp/ferox.zip 2>/dev/null || true
+
+# nuclei
+RUN go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+
+# dalfox (XSS scanner)
+RUN go install -v github.com/hahwul/dalfox/v2@latest
+
+# sqlmap
+RUN pip install --no-cache-dir sqlmap
+
+# testssl.sh
+RUN curl -sL https://github.com/drwetter/testssl.sh/archive/refs/heads/3.2.zip \
+    -o /tmp/testssl.zip && unzip -q /tmp/testssl.zip -d /tmp && \
+    mv /tmp/testssl.sh-3.2/testssl.sh /usr/local/bin/testssl.sh && \
+    chmod +x /usr/local/bin/testssl.sh && rm -rf /tmp/testssl*
+
+# wpscan
+RUN apt-get update && apt-get install -y ruby ruby-dev libcurl4-openssl-dev libssl-dev && \
+    gem install wpscan --no-document && \
+    rm -rf /var/lib/apt/lists/*
 
 # Python dependencies
 COPY requirements.txt ./
